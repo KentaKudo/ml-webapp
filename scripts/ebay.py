@@ -1,9 +1,12 @@
-import os, csv
+import os, io, csv, tempfile
 token = os.environ['EBAY_TOKEN']
 
 from flask import Flask
 from flask_script import Manager, Command
+from PIL import Image
+import numpy as np
 import requests
+import pickle
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -38,5 +41,38 @@ class SearchJeans(Command):
 
         return response["next"] if "next" in response else None, items
 
+class Preprocess(Command):
+    def run(self):
+        with open("../datasets/jeans.csv", 'r') as file:
+            reader = csv.reader(file)
+            data = []
+            for row in reader:
+                image = self.downloadImage(row[1])
+                data.append({'x': np.array(image), 'y': row[2]})
+            self.save(data)
+
+    def downloadImage(self, url):
+        buffer = tempfile.SpooledTemporaryFile(max_size=1e9)
+        r = requests.get(url, stream=True)
+        i = None
+        if r.status_code == 200:
+            downloaded = 0
+            filesize = int(r.headers['content-length'])
+            for chunk in r.iter_content():
+                downloaded += len(chunk)
+                buffer.write(chunk)
+                print(downloaded/filesize)
+            buffer.seek(0)
+            i = Image.open(io.BytesIO(buffer.read()))
+        buffer.close()
+        return i
+
+    def save(self, data):
+        with open('../datasets/jeans.pickle', 'wb') as handle:
+            pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 if __name__ == "__main__":
-    manager.run({'search_jeans' : SearchJeans()})
+    manager.run({
+        'search_jeans': SearchJeans(),
+        'preprocess'  : Preprocess()
+    })
