@@ -46,10 +46,16 @@ class Preprocess(Command):
         with open("../datasets/jeans.csv", 'r') as file:
             reader = csv.reader(file)
             data = []
+            idx = 0
             for row in reader:
                 image = self.downloadImage(row[1])
                 data.append({'x': np.array(image), 'y': row[2]})
-            self.save(data)
+                if len(data) == 1000:
+                    self.save(data, idx)
+                    data = []
+                    idx += 1
+            if not len(data) == 0:
+                self.save(data, idx)
 
     def downloadImage(self, url):
         buffer = tempfile.SpooledTemporaryFile(max_size=1e9)
@@ -61,14 +67,13 @@ class Preprocess(Command):
             for chunk in r.iter_content():
                 downloaded += len(chunk)
                 buffer.write(chunk)
-                print(downloaded/filesize)
             buffer.seek(0)
             i = Image.open(io.BytesIO(buffer.read()))
         buffer.close()
         return i
 
-    def save(self, data):
-        with open('../datasets/jeans.pickle', 'wb') as handle:
+    def save(self, data, idx):
+        with open('../datasets/jeans_'+str(idx)+'.pickle', 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
