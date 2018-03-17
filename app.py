@@ -20,8 +20,8 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'file' not in request.files:
-        return
+    if 'img' not in request.files:
+        return "400"
     file = request.files['img']
     img = Image.open(file.filename)
     y = predict(np.array(resizeImage(img)))
@@ -29,4 +29,4 @@ def predict():
                            prediction=y)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
