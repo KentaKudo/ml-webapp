@@ -48,7 +48,7 @@ class Preprocess(Command):
             data = []
             for row in reader:
                 image = self.downloadImage(row[1])
-                data.append({'x': np.array(image), 'y': float(row[2]})
+                data.append({'x': np.array(image), 'y': float(row[2])})
                 if len(data) == 1000:
                     self.save(data)
                     data = []
