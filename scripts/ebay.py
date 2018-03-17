@@ -1,5 +1,4 @@
 import os, io, csv, tempfile
-token = os.environ['EBAY_TOKEN']
 
 from flask import Flask
 from flask_script import Manager, Command
@@ -28,6 +27,7 @@ class SearchJeans(Command):
                 total += len(items)
 
     def request(self, url):
+        token = os.environ['EBAY_TOKEN']
         r = requests.get(url, headers={'Authorization': 'Bearer ' + token})        
         response = r.json()
         if "warnings" in response and "message" in response["warnings"]:
@@ -46,16 +46,14 @@ class Preprocess(Command):
         with open("../datasets/jeans.csv", 'r') as file:
             reader = csv.reader(file)
             data = []
-            idx = 0
             for row in reader:
                 image = self.downloadImage(row[1])
                 data.append({'x': np.array(image), 'y': row[2]})
                 if len(data) == 1000:
-                    self.save(data, idx)
+                    self.save(data)
                     data = []
-                    idx += 1
             if not len(data) == 0:
-                self.save(data, idx)
+                self.save(data)
 
     def downloadImage(self, url):
         buffer = tempfile.SpooledTemporaryFile(max_size=1e9)
@@ -72,9 +70,14 @@ class Preprocess(Command):
         buffer.close()
         return i
 
-    def save(self, data, idx):
-        with open('../datasets/jeans_'+str(idx)+'.pickle', 'wb') as handle:
-            pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    def save(self, data):
+        if not os.path.isfile("../datasets/jeans.pkl"):
+            with open('../datasets/jeans.pkl', 'wb') as handle:
+                pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        else:
+            with open('../datasets/jeans.pkl', 'rb+') as handle:
+                datasets = pickle.load(handle)
+                pickle.dump(datasets + data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
     manager.run({
