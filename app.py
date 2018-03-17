@@ -8,6 +8,8 @@ import numpy as np
 from vectorizer import vect
 from update import update_model
 from models import InceptionV3
+from PIL import Image
+from utils import resizeImage
 
 app = Flask(__name__)
 
@@ -76,6 +78,14 @@ def feedback():
     train(review, y)
     sqlite_entry(db, review, y)
     return render_template('thanks.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return
+    file = request.files['img']
+    img = Image.open(file.filename)
+    return predict(np.array(resizeImage(img)))
 
 if __name__ == '__main__':
     clf = update_model(db_path=db,
