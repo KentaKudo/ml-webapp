@@ -23,8 +23,9 @@ def predict():
     if 'img' not in request.files:
         return "400"
     file = request.files['img']
-    img = Image.open(file.filename)
-    y = predict(np.array(resizeImage(img)))
+    img = Image.open(file)
+    resized = resizeImage(img, target_size=(225, 225))
+    y = predict(np.array(resized))
     return render_template('results.html',
                            prediction=y)
 
