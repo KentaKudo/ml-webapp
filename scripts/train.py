@@ -18,7 +18,7 @@ class Train(Command):
         (X_train, y_train, X_valid, y_valid) = train_test_split(
             X_train, y_train, test_size=0.2, random_state=42)
         
-        x = InceptionV3(input_shape=(225,225))
+        x = InceptionV3(input_shape=(225,225,3))
         model = Dense(1, activation='linear')(x)
         model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
         history = model.fit(X_train, y_train,
