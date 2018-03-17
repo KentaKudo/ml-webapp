@@ -1,7 +1,10 @@
+import sys
+sys.path.append('..')
+
 from flask import Flask
 from flask_script import Manager, Command
 import pickle
-from ../datasets import load_datasets
+from datasets import load_datasets
 
 app = Flask(__name__)
 manager = Manager(app)
