@@ -18,8 +18,8 @@ def predict(img):
 def index():
     return render_template('form.html')
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/result', methods=['POST'])
+def result():
     if 'img' not in request.files:
         return "400"
     file = request.files['img']
