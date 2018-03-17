@@ -15,11 +15,12 @@ manager = Manager(app)
 class Train(Command):
     def run(self):
         (X_train, y_train), (X_test, y_test) = load_datasets()
-        (X_train, y_train, X_valid, y_valid) = train_test_split(
+        (X_train, X_valid, y_train, y_valid) = train_test_split(
             X_train, y_train, test_size=0.2, random_state=42)
         
-        x = InceptionV3(input_shape=(225,225,3))
-        model = Dense(1, activation='linear')(x)
+        inception_v3 = InceptionV3(input_shape=(225,225,3))
+        x = Dense(1, activation='linear')(inception_v3.outputs[0])
+        model = Model(inception_v3.inputs[0], x)
         model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
         history = model.fit(X_train, y_train,
                             batch_size=32, epochs=5, verbose=2,
