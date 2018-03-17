@@ -1,11 +1,11 @@
 import os, io, csv, tempfile
 
-from flask import Flask
-from flask_script import Manager, Command
-from PIL import Image
 import numpy as np
 import requests
 import pickle
+from flask import Flask
+from flask_script import Manager, Command
+from PIL import Image
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -48,7 +48,8 @@ class Preprocess(Command):
             data = []
             for row in reader:
                 image = self.downloadImage(row[1])
-                data.append({'x': np.array(image), 'y': float(row[2])})
+                resized = self.resizeImage(image, target_size=(225, 225))
+                data.append({'x': np.array(resized), 'y': float(row[2])})
                 if len(data) == 1000:
                     self.save(data)
                     data = []
@@ -69,6 +70,12 @@ class Preprocess(Command):
             i = Image.open(io.BytesIO(buffer.read()))
         buffer.close()
         return i
+
+    def resizeImage(self, img, target_size):
+        width_height_tuple = (target_size[1], target_size[0])
+        if img.size != width_height_tuple:
+            img = img.resize(width_height_tuple, Image.NEAREST)
+        return img
 
     def save(self, data):
         datasets = []

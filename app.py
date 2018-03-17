@@ -7,6 +7,7 @@ import numpy as np
 
 from vectorizer import vect
 from update import update_model
+from models import InceptionV3
 
 app = Flask(__name__)
 
@@ -22,6 +23,11 @@ def classify(document):
     y = clf.predict(X)[0]
     proba = np.max(clf.predict_proba(X))
     return label[y], proba
+
+def predict(img):
+    model = InceptionV3()
+    model.load_weights('weights/jeans.hdf5')
+    return model.predict(img)
 
 def train(document, y):
     X = vect.transform([document])
