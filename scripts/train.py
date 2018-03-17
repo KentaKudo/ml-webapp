@@ -15,7 +15,7 @@ manager = Manager(app)
 class Train(Command):
     def run(self):
         (X_train, y_train), (X_test, y_test) = load_datasets()
-        (X_train, y_train), (X_valid, y_valid) = train_test_split(
+        (X_train, y_train, X_valid, y_valid) = train_test_split(
             X_train, y_train, test_size=0.2, random_state=42)
         
         x = InceptionV3(input_shape=(225,225))
