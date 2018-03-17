@@ -1,18 +1,15 @@
 from flask import Flask
 from flask_script import Manager, Command
 import pickle
+from ../datasets import load_datasets
 
 app = Flask(__name__)
 manager = Manager(app)
 
 class Train(Command):
   def run(self):
-    (x_train, y_train), (x_test, y_test) = self.load_datasets()
-
-  def load_datasets(self):
-    with open("../datasets/jeans.pkl") as handler:
-      datasets = pickle.load(handler)
-    return datasets
+    (X_train, y_train), (X_test, y_test) = load_datasets()
+    print (X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
 if __name__ == "__main__":
   manager.run({
