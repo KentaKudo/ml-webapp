@@ -71,13 +71,13 @@ class Preprocess(Command):
         return i
 
     def save(self, data):
-        if not os.path.isfile("../datasets/jeans.pkl"):
-            with open('../datasets/jeans.pkl', 'wb') as handle:
-                pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        else:
-            with open('../datasets/jeans.pkl', 'rb+') as handle:
+        datasets = []
+        if os.path.exists("../datasets/jeans.pkl"):
+            with open('../datasets/jeans.pkl', 'rb') as handle:
                 datasets = pickle.load(handle)
-                pickle.dump(datasets + data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
+        with open('../datasets/jeans.pkl', 'wb') as handle:
+            pickle.dump(datasets + data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
     manager.run({
