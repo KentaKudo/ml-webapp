@@ -56,12 +56,12 @@ class Mine(Command):
 
     def request(self, url):
         token = os.environ['EBAY_TOKEN']
-        r = requests.get(url, headers={'Authorization: Bearer '+token})
+        r = requests.get(url, headers={'Authorization': 'Bearer '+token})
         response = r.json()
         if not "itemSummaries" in response:
             return response["next"] if "next" in response else None, []
         items = list(map(lambda x: [x["itemId"], x["image"]["imageUrl"]],
-                         filter(lambda x: "image" in item, response["itemSummaries"])))
+                         filter(lambda x: "image" in x, response["itemSummaries"])))
         return response["next"] if "next" in response else None, items
 
 class Pickle(Command):
