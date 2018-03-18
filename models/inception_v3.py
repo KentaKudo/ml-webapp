@@ -2,9 +2,7 @@ from keras.applications.inception_v3 import InceptionV3 as Iv3
 from keras.layers import Dense
 from keras.models import Model
 
-def InceptionV3():
-  inception_v3 = Iv3(weights=None, input_shape=(225,225,3))
-  x = Dense(1, activation='linear')(inception_v3.outputs[0])
-  model = Model(inception_v3.inputs[0], x)
-  
-  return model
+image_size = (225,225)
+
+def InceptionV3(num_classes=1000):
+    return Iv3(weights=None, input_shape=image_size+(3,), classes=num_classes)

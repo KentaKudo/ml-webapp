@@ -10,6 +10,8 @@ from flask_script import Manager, Command
 from PIL import Image
 from utils import resizeImage
 from tqdm import tqdm
+from datasets import categories
+from models import image_size
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -18,37 +20,14 @@ limit = 200
 max_per_cat = 10000
 base_url = "https://api.ebay.com/buy/browse/v1"
 endpoint = "/item_summary/search"
-image_size = (225,225)
 batch_size = 1000
-
-# http://pages.ebay.com/sellerinformation/growing/categorychanges/clothing-all.html
-categories = {
-    'casual_shirts'         : 57990,
-    'dress_shirts'          : 57991,
-    't_shirts'              : 15687,
-    'athletic_apparel'      : 137084,
-    'blazers_and_sport_oats': 3002,
-    'coats_and_jackets'     : 57988,
-    'jeans'                 : 11483,
-    'pants'                 : 57989,
-    'shorts'                : 15689,
-    'sleepwear_and_robes'   : 11510,
-    'socks'                 : 11511,
-    'suits'                 : 3001,
-    'sweaters'              : 11484,
-    'sweats_and_hoodies'    : 155183,
-    'swimwear'              : 15690,
-    'underwear'             : 1507,
-    'vests'                 : 15691,
-    'mixed_items_and_lots'  : 84434,
-}
 
 class Mine(Command):
     def run(self):
-        for k, v in tqdm(categories.items()):
+        for v in tqdm(categories):
             total = 0
-            url = base_url+endpoint+"?category_ids="+str(v)+"&limit="+str(limit)
-            with open("../datasets/"+k+".csv", 'w') as file:
+            url = base_url+endpoint+"?category_ids="+str(v['id'])+"&limit="+str(limit)
+            with open("../datasets/"+v['name']+".csv", 'w') as file:
                 writer = csv.writer(file)
                 while total < max_per_cat and url is not None:
                     url, items = self.request(url)
@@ -67,16 +46,16 @@ class Mine(Command):
 
 class Pickle(Command):
     def run(self):
-        for k, v in tqdm(categories.items()):
-            with open("../datasets/"+k+".csv", "r") as file:
+        for i, v in enumerate(tqdm(categories)):
+            with open("../datasets/"+v['name']+".csv", "r") as file:
                 reader = csv.reader(file)
                 data = []
                 for row in reader:
                     image = self.downloadImage(row[1])
                     resized = resizeImage(image, target_size=image_size)
-                    data.append({'x': np.array(resized), 'y': v})
+                    data.append({'x': np.array(resized), 'y': i})
                     if len(data) >= batch_size:
-                        self.save(k, data)
+                        self.save(data)
                         data = []
                 if not len(data) == 0:
                     self.save(data)
@@ -96,7 +75,7 @@ class Pickle(Command):
         buffer.close()
         return i
 
-    def save(self, category, data):
+    def save(self, data):
         datasets = []
         if os.path.exists("../datasets/datasets.pkl"):
             with open('../datasets/datasets.pkl', 'rb') as handle:

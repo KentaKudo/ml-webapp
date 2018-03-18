@@ -4,10 +4,11 @@ sys.path.append('..')
 from flask import Flask
 from flask_script import Manager, Command
 import pickle
-from datasets import load_datasets
-from models import InceptionV3
+from datasets import load_datasets, num_classes
+from models import InceptionV3, image_size
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
+from keras.utils import to_categorical
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -15,11 +16,13 @@ manager = Manager(app)
 class Train(Command):
     def run(self):
         (X_train, y_train), (X_test, y_test) = load_datasets()
+        y_train = to_categorical(y_train, num_classes)
+        y_test = to_categorical(y_test, num_classes)
         
-        model = InceptionV3()
-        model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+        model = InceptionV3(num_classes=num_classes)
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-        checkpointer = ModelCheckpoint(filepath="../weights/jeans.hdf5", verbose=1, save_best_only=True)
+        checkpointer = ModelCheckpoint(filepath="../weights/category.hdf5", verbose=1, save_best_only=True)
         history = model.fit(X_train, y_train,
                             batch_size=32, epochs=5, verbose=2,
                             validation_split=0.2,
