@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from flask import Flask
-from flask_script import Manager, Command
+from flask_script import Manager, Command, Option
 
 app = Flask(__name__)
 manager = Manager(app)
