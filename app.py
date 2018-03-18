@@ -3,17 +3,19 @@ import pickle
 import os
 import numpy as np
 
-from models import InceptionV3
+from models import InceptionV3, image_size
 from PIL import Image
 from utils import resizeImage
+from datasets import categories, num_classes
 
 app = Flask(__name__)
+model = InceptionV3(num_classes=num_classes)
+model.load_weights('weights/category.hdf5')
 
 def predict(img):
-    model = InceptionV3()
-    model.load_weights('weights/jeans.hdf5')
     img = np.expand_dims(img, axis=0)
-    return model.predict(img)
+    y = model.predict(img)
+    return np.argmax(y[0])
 
 @app.route('/')
 def index():
@@ -24,11 +26,11 @@ def result():
     if 'img' not in request.files:
         return "400"
     file = request.files['img']
-    img = Image.open(file)
-    resized = resizeImage(img, target_size=(225, 225))
+    img = Image.open(file).convert('RGB')
+    resized = resizeImage(img, target_size=image_size)
     y = predict(np.array(resized))
     return render_template('results.html',
-                           prediction=y)
+                           prediction=categories[y]['name'])
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
