@@ -21,6 +21,7 @@ max_per_cat = 10000
 base_url = "https://api.ebay.com/buy/browse/v1"
 endpoint = "/item_summary/search"
 batch_size = 1000
+pkl_per_cat = int(os.environ['PER_CAT']) if 'PER_CAT' in os.environ else 3000
 
 class Mine(Command):
     def run(self):
@@ -50,13 +51,17 @@ class Pickle(Command):
             with open("../datasets/"+v['name']+".csv", "r") as file:
                 reader = csv.reader(file)
                 data = []
+                count = 0
                 for row in reader:
-                    image = self.downloadImage(row[1])
+                    image = self.downloadImage(row[1]).convert('RGB')
                     resized = resizeImage(image, target_size=image_size)
                     data.append({'x': np.array(resized), 'y': i})
                     if len(data) >= batch_size:
                         self.save(data)
                         data = []
+                    count += 1
+                    if count >= pkl_per_cat:
+                        break
                 if not len(data) == 0:
                     self.save(data)
 
