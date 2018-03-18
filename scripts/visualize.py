@@ -7,19 +7,21 @@ from flask_script import Manager, Command
 app = Flask(__name__)
 manager = Manager(app)
 
-class Export(Command):
+class Model(Command):
     def run(self):
-        self.plot_model()
-        self.plot_history()
-
-    def plot_model(self):
         from datasets import num_classes
         from models import InceptionV3
         from keras.utils import plot_model
         model = InceptionV3(num_classes=num_classes)
         plot_model(model, to_file="../models/inception_v3.png")
 
-    def plot_history(self):
+class History(Command):
+
+    option_list = (
+        Option('--filename', '-f', dest='filename', default='history'),
+    )
+
+    def run(self, filename):
         import matplotlib
         matplotlib.use('Agg')
         import pickle
@@ -35,9 +37,10 @@ class Export(Command):
         plt.xlabel('epoch')
         plt.ylabel('loss')
         plt.legend(loc='center right')
-        plt.savefig("../weights/history.png")
+        plt.savefig("../weights/"+filename+".png")
 
 if __name__ == "__main__":
     manager.run({
-      'export': Export()
+      'model': Model(),
+      'history': History(),
     })
