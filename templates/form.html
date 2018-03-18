@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Movie Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <h2>Please upload your jeans:</h2>
+
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data action="/result">
+      <input type=file name=img>
+      <div>
+        <input type=submit value=Upload>
+      </div>
+    </form>
+  </body>
+</html>
+
