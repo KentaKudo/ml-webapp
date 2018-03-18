@@ -9,10 +9,10 @@ from utils import resizeImage
 from datasets import categories, num_classes
 
 app = Flask(__name__)
-model = InceptionV3(num_classes=num_classes)
-model.load_weights('weights/category.hdf5')
 
 def predict(img):
+    model = InceptionV3(num_classes=num_classes)
+    model.load_weights('weights/category.hdf5')
     img = np.expand_dims(img, axis=0)
     y = model.predict(img)
     return np.argmax(y[0])
