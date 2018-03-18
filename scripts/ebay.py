@@ -9,6 +9,7 @@ from flask import Flask
 from flask_script import Manager, Command
 from PIL import Image
 from utils import resizeImage
+from tqdm import tqdm
 
 app = Flask(__name__)
 manager = Manager(app)
@@ -44,7 +45,7 @@ categories = {
 
 class Mine(Command):
     def run(self):
-        for k, v in categories.items():
+        for k, v in tqdm(categories.items()):
             total = 0
             url = base_url+endpoint+"?category_ids="+str(v)+"&limit="+str(limit)
             with open("../datasets/"+k+".csv", 'w') as file:
@@ -66,7 +67,7 @@ class Mine(Command):
 
 class Pickle(Command):
     def run(self):
-        for k, v in categories.items():
+        for k, v in tqdm(categories.items()):
             with open("../datasets/"+k+".csv", "r") as file:
                 reader = csv.reader(file)
                 data = []
