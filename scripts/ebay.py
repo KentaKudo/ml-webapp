@@ -17,6 +17,8 @@ limit = 200
 max_per_cat = 10000
 base_url = "https://api.ebay.com/buy/browse/v1"
 endpoint = "/item_summary/search"
+image_size = (225,225)
+batch_size = 1000
 
 # http://pages.ebay.com/sellerinformation/growing/categorychanges/clothing-all.html
 categories = {
@@ -62,20 +64,21 @@ class Mine(Command):
                          filter(lambda x: "image" in item, response["itemSummaries"])))
         return response["next"] if "next" in response else None, items
 
-class Preprocess(Command):
+class Pickle(Command):
     def run(self):
-        with open("../datasets/jeans.csv", 'r') as file:
-            reader = csv.reader(file)
-            data = []
-            for row in reader:
-                image = self.downloadImage(row[1])
-                resized = resizeImage(image, target_size=(225, 225))
-                data.append({'x': np.array(resized), 'y': float(row[2])})
-                if len(data) == 1000:
+        for k, v in categories.items():
+            with open("../datasets/"+k+".csv", "r") as file:
+                reader = csv.reader(file)
+                data = []
+                for row in reader:
+                    image = self.downloadImage(row[1])
+                    resized = resizeImage(image, target_size=image_size)
+                    data.append({'x': np.array(resized), 'y': v})
+                    if len(data) >= batch_size:
+                        self.save(k, data)
+                        data = []
+                if not len(data) == 0:
                     self.save(data)
-                    data = []
-            if not len(data) == 0:
-                self.save(data)
 
     def downloadImage(self, url):
         buffer = tempfile.SpooledTemporaryFile(max_size=1e9)
@@ -92,17 +95,17 @@ class Preprocess(Command):
         buffer.close()
         return i
 
-    def save(self, data):
+    def save(self, category, data):
         datasets = []
-        if os.path.exists("../datasets/jeans.pkl"):
-            with open('../datasets/jeans.pkl', 'rb') as handle:
+        if os.path.exists("../datasets/"+category+".pkl"):
+            with open('../datasets/'+category+'.pkl', 'rb') as handle:
                 datasets = pickle.load(handle)
         
-        with open('../datasets/jeans.pkl', 'wb') as handle:
+        with open('../datasets/'+category+'.pkl', 'wb') as handle:
             pickle.dump(datasets + data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
     manager.run({
-        'search_jeans': SearchJeans(),
-        'preprocess'  : Preprocess()
+        'mine'  : Mine(),
+        'pickle': Pickle(),
     })
