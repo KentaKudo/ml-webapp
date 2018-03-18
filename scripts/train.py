@@ -32,7 +32,7 @@ class Train(Command):
         # save model
         with open('../weights/history.pkl', 'wb') as f:
             pickle.dump(history.history, f, protocol=pickle.HIGHEST_PROTOCOL)
-        with open('../weights/model.json', 'w') as f:
+        with open('../models/inception_v3.json', 'w') as f:
             f.write(model.to_json())
 
         print('Loss:', score[0])
