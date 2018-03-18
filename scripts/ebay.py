@@ -98,11 +98,11 @@ class Pickle(Command):
 
     def save(self, category, data):
         datasets = []
-        if os.path.exists("../datasets/"+category+".pkl"):
-            with open('../datasets/'+category+'.pkl', 'rb') as handle:
+        if os.path.exists("../datasets/datasets.pkl"):
+            with open('../datasets/datasets.pkl', 'rb') as handle:
                 datasets = pickle.load(handle)
         
-        with open('../datasets/'+category+'.pkl', 'wb') as handle:
+        with open('../datasets/datasets.pkl', 'wb') as handle:
             pickle.dump(datasets + data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
