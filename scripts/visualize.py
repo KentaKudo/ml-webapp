@@ -20,6 +20,8 @@ class Export(Command):
         plot_model(model, to_file="../models/inception_v3.png")
 
     def plot_history(self):
+        import matplotlib
+        matplotlib.use('Agg')
         import pickle
         import matplotlib.pyplot as plt
         history = None
