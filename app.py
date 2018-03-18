@@ -12,6 +12,7 @@ app = Flask(__name__)
 def predict(img):
     model = InceptionV3()
     model.load_weights('weights/jeans.hdf5')
+    img = np.expand_dims(img, axis=0)
     return model.predict(img)
 
 @app.route('/')
