@@ -1,4 +1,4 @@
-import sys
+import os, sys
 sys.path.append('..')
 
 from flask import Flask
@@ -13,6 +13,8 @@ from keras.utils import to_categorical
 app = Flask(__name__)
 manager = Manager(app)
 
+epochs = os.environ['EPOCHS'] if 'EPOCHS' in os.environ else 5
+
 class Train(Command):
     def run(self):
         (X_train, y_train), (X_test, y_test) = load_datasets()
@@ -24,7 +26,7 @@ class Train(Command):
 
         checkpointer = ModelCheckpoint(filepath="../weights/category.hdf5", verbose=1, save_best_only=True)
         history = model.fit(X_train, y_train,
-                            batch_size=32, epochs=5, verbose=2,
+                            batch_size=32, epochs=epochs, verbose=2,
                             validation_split=0.2,
                             callbacks=[checkpointer])
         score = model.evaluate(X_test, y_test, verbose=0)
