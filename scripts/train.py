@@ -13,7 +13,7 @@ from keras.utils import to_categorical
 app = Flask(__name__)
 manager = Manager(app)
 
-epochs = os.environ['EPOCHS'] if 'EPOCHS' in os.environ else 5
+epochs = int(os.environ['EPOCHS']) if 'EPOCHS' in os.environ else 5
 
 class Train(Command):
     def run(self):
