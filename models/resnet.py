@@ -1,3 +1,5 @@
+from . import image_size
+
 def ResNet(num_classes):
     from keras.models import Model
     from keras.layers import Dense, Conv2D, MaxPooling2D, Flatten, Input, BatchNormalization, Add, Activation, GlobalAveragePooling2D

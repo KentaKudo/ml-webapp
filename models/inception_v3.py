@@ -1,3 +1,5 @@
+from . import image_size
+
 def InceptionV3(num_classes=1000):
     from keras.applications.inception_v3 import InceptionV3 as Iv3
     from keras.layers import Dense
