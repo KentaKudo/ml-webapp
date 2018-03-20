@@ -26,7 +26,7 @@ class Train(Command):
 
         checkpointer = ModelCheckpoint(filepath="../weights/category.hdf5", verbose=1, save_best_only=True)
         history = model.fit(X_train, y_train,
-                            batch_size=32, epochs=epochs, verbose=2,
+                            batch_size=16, epochs=epochs, verbose=2,
                             validation_split=0.2,
                             callbacks=[checkpointer])
         score = model.evaluate(X_test, y_test, verbose=0)
