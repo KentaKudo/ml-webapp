@@ -10,10 +10,10 @@ manager = Manager(app)
 class Model(Command):
     def run(self):
         from datasets import num_classes
-        from models import InceptionV3
+        from models import ResNet
         from keras.utils import plot_model
-        model = InceptionV3(num_classes=num_classes)
-        plot_model(model, to_file="../models/inception_v3.png")
+        model = ResNet(num_classes=num_classes)
+        plot_model(model, to_file="../models/resnet.png")
 
 class History(Command):
 
