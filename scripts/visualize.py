@@ -10,10 +10,10 @@ manager = Manager(app)
 class Model(Command):
     def run(self):
         from datasets import num_classes
-        from models import ResNet
+        from models import ResNet2
         from keras.utils import plot_model
         model = ResNet(num_classes=num_classes)
-        plot_model(model, to_file="../models/resnet.png")
+        plot_model(model, to_file="../models/resnet2.png")
 
 class History(Command):
 

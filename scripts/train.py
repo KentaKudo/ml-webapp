@@ -5,7 +5,7 @@ from flask import Flask
 from flask_script import Manager, Command
 import pickle
 from datasets import load_datasets, num_classes
-from models import ResNet, image_size
+from models import ResNet2, image_size
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
 from keras.utils import to_categorical
@@ -21,7 +21,7 @@ class Train(Command):
         y_train = to_categorical(y_train, num_classes)
         y_test = to_categorical(y_test, num_classes)
         
-        model = ResNet(num_classes=num_classes)
+        model = ResNet2(num_classes=num_classes)
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         checkpointer = ModelCheckpoint(filepath="../weights/category.hdf5", verbose=1, save_best_only=True)
@@ -34,7 +34,7 @@ class Train(Command):
         # save model
         with open('../weights/history.pkl', 'wb') as f:
             pickle.dump(history.history, f, protocol=pickle.HIGHEST_PROTOCOL)
-        with open('../models/resnet.json', 'w') as f:
+        with open('../models/resnet2.json', 'w') as f:
             f.write(model.to_json())
 
         print('Loss:', score[0])

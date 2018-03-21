@@ -3,7 +3,7 @@ import pickle
 import os
 import numpy as np
 
-from models import ResNet, image_size
+from models import ResNet2, image_size
 from PIL import Image
 from utils import resizeImage
 from datasets import categories, num_classes
@@ -11,7 +11,7 @@ from datasets import categories, num_classes
 app = Flask(__name__)
 
 def predict(img):
-    model = ResNet(num_classes=num_classes)
+    model = ResNet2(num_classes=num_classes)
     model.load_weights('weights/category.hdf5')
     img = np.expand_dims(img, axis=0)
     y = model.predict(img)
