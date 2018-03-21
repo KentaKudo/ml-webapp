@@ -1,12 +1,13 @@
 from . import image_size
 
-stack_n = 5
-
 # https://github.com/BIGBALLON/cifar-10-cnn/blob/master/4_Residual_Network/ResNet_keras.py
 def ResNet2(num_classes):
     from keras.models import Model
-    from keras.layers import Input, Conv2D, Activation, BatchNormalization, GlobalAveragePooling2D, Dense
+    from keras.layers import Input, Conv2D, Activation, BatchNormalization, GlobalAveragePooling2D, Dense, Add
     from keras.regularizers import l2
+
+    weight_decay = 1e-4
+    stack_n = 5
 
     def resblock(filters, increase=False):
         stride = (2, 2) if increase else (1, 1)
